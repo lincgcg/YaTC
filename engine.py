@@ -142,6 +142,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             print("after")
             print(samples.shape)
             print(targets.shape)
+            print(outputs.shape)
             
             loss = criterion(outputs, targets)
 
