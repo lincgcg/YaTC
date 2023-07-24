@@ -125,9 +125,9 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         if mixup_fn is not None:
             samples, targets = mixup_fn(samples, targets)
             
-            print("before")
-            print(samples.shape)
-            print(targets.shape)
+            # print("before")
+            # print(samples.shape)
+            # print(targets.shape)
                 
         with torch.cuda.amp.autocast():
             # import ipdb; ipdb.set_trace()
@@ -139,10 +139,10 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             # print(outputs.shape)
             # print(targets.shape)
             
-            print("after")
-            print(samples.shape)
-            print(targets.shape)
-            print(outputs.shape)
+            # print("after")
+            # print(samples.shape)
+            # print(targets.shape)
+            # print(outputs.shape)
             
             loss = criterion(outputs, targets)
 

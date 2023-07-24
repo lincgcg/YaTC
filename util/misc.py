@@ -204,9 +204,9 @@ def save_on_master(*args, **kwargs):
 
 def init_distributed_mode(args):
     
-    # 获取所有环境变量和值
-    for key, value in os.environ.items():
-            print(f"{key}: {value}")
+    # # 获取所有环境变量和值
+    # for key, value in os.environ.items():
+    #         print(f"{key}: {value}")
     
     if args.dist_on_itp:
         
