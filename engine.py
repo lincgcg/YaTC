@@ -125,6 +125,11 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
         with torch.cuda.amp.autocast():
             outputs = model(samples)
+            
+            # debug
+            print(outputs.shape)
+            print(targets.shape)
+            
             loss = criterion(outputs, targets)
 
         _, pred = outputs.topk(1, 1, True, True)
