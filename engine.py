@@ -15,11 +15,11 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support, con
 import matplotlib.pyplot as plt
 import numpy as np
 
+import wandb
 
 def pretrain_one_epoch(model: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
                     device: torch.device, epoch: int, loss_scaler,
-                    log_writer=None,
                     model_without_ddp=None,
                     args=None):
     model.train(True)
@@ -33,8 +33,8 @@ def pretrain_one_epoch(model: torch.nn.Module,
 
     optimizer.zero_grad()
 
-    if log_writer is not None:
-        print('log_dir: {}'.format(log_writer.log_dir))
+    # if log_writer is not None:
+    #     print('log_dir: {}'.format(log_writer.log_dir))
 
     steps_of_one_epoch = len(data_loader)
 
@@ -71,13 +71,22 @@ def pretrain_one_epoch(model: torch.nn.Module,
         metric_logger.update(lr=lr)
 
         loss_value_reduce = misc.all_reduce_mean(loss_value)
-        if log_writer is not None and (data_iter_step + 1) % accum_iter == 0:
+        # if log_writer is not None and (data_iter_step + 1) % accum_iter == 0:
+        #     """ We use epoch_1000x as the x-axis in tensorboard.
+        #     This calibrates different curves when batch size changes.
+        #     """
+        #     epoch_1000x = int((data_iter_step / len(data_loader) + epoch) * 1000)
+        #     log_writer.add_scalar('train_loss', loss_value_reduce, epoch_1000x)
+        #     log_writer.add_scalar('lr', lr, epoch_1000x)
+            
+        if (data_iter_step + 1) % accum_iter == 0:
             """ We use epoch_1000x as the x-axis in tensorboard.
             This calibrates different curves when batch size changes.
             """
             epoch_1000x = int((data_iter_step / len(data_loader) + epoch) * 1000)
-            log_writer.add_scalar('train_loss', loss_value_reduce, epoch_1000x)
-            log_writer.add_scalar('lr', lr, epoch_1000x)
+            wandb.log({"train_loss": loss_value_reduce})
+            args.logger.info("Epoch id: {}, Training steps: {}, Avg loss: {:.3f}".format(epoch, data_iter_step + 1, loss_value_reduce))
+            # log_writer.add_scalar('lr', lr, epoch_1000x)
         if args.output_dir and steps % args.save_steps_freq == 0 and epoch > 0:
             misc.save_model(
                 args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,

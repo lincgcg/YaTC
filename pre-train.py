@@ -8,7 +8,7 @@ from pathlib import Path
 
 import torch
 import torch.backends.cudnn as cudnn
-from torch.utils.tensorboard import SummaryWriter
+# from torch.utils.tensorboard import SummaryWriter
 import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
@@ -26,6 +26,7 @@ import PIL
 
 from engine import pretrain_one_epoch
 
+import wandb
 
 def get_args_parser():
     parser = argparse.ArgumentParser('YaTC pre-training', add_help=False)
@@ -95,6 +96,10 @@ def get_args_parser():
     parser.add_argument('--dist_on_itp', action='store_true')
     parser.add_argument('--dist_url', default='env://',
                         help='url used to set up distributed training')
+    
+    # for wandb
+    parser.add_argument('--wandb_name', type=str,
+                    help='name for wandb init')
 
     return parser
 
@@ -138,9 +143,9 @@ def main(args):
 
     if global_rank == 0 and args.log_dir is not None:
         os.makedirs(args.log_dir, exist_ok=True)
-        log_writer = SummaryWriter(log_dir=args.log_dir)
-    else:
-        log_writer = None
+        # log_writer = SummaryWriter(log_dir=args.log_dir)
+    # else:
+    #     log_writer = None
 
     data_loader_train = torch.utils.data.DataLoader(
         dataset_train, sampler=sampler_train,
@@ -196,7 +201,7 @@ def main(args):
         train_stats = pretrain_one_epoch(
             model, data_loader_train,
             optimizer, device, epoch, loss_scaler,
-            log_writer=log_writer,
+            # log_writer=log_writer,
             model_without_ddp=model_without_ddp,
             args=args
         )
@@ -205,8 +210,8 @@ def main(args):
                         'epoch': epoch, }
 
         if args.output_dir and misc.is_main_process():
-            if log_writer is not None:
-                log_writer.flush()
+            # if log_writer is not None:
+            #     log_writer.flush()
             with open(os.path.join(args.output_dir, "log.txt"), mode="a", encoding="utf-8") as f:
                 f.write(json.dumps(log_stats) + "\n")
 
@@ -216,8 +221,20 @@ def main(args):
 
 
 if __name__ == '__main__':
+    
     args = get_args_parser()
     args = args.parse_args()
+    
+    wandb.init(
+    # set the wandb project where this run will be logged
+    project="YaTC",
+    name = args.wandb_name,
+    # track hyperparameters and run metadata
+    config={
+    "data_path": args.data_path,
+    "output_dir": args.output_dir
+    }
+    )
     if args.output_dir:
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
     main(args)
