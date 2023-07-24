@@ -119,22 +119,22 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             lr_sched.adjust_learning_rate(optimizer, data_iter_step / len(data_loader) + epoch, args)
 
         samples = samples.to(device, non_blocking=True)
-        print(samples.shape)
+        # print(samples.shape)
         targets = targets.to(device, non_blocking=True)
 
         if mixup_fn is not None:
             samples, targets = mixup_fn(samples, targets)
-        
-        print(samples.shape)
-        
+                
         with torch.cuda.amp.autocast():
             outputs = model(samples)
+            
+            print(outputs)
             
             # debug
             # outputs = F.softmax(outputs, dim=1)
             
-            print(outputs.shape)
-            print(targets.shape)
+            # print(outputs.shape)
+            # print(targets.shape)
             
             loss = criterion(outputs, targets)
 
