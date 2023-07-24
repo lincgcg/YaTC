@@ -64,6 +64,10 @@ def get_args_parser():
     parser.add_argument('--warmup_epochs', type=int, default=25, metavar='N',
                         help='epochs to warmup LR')
 
+    # 添加epoch
+    parser.add_argument('--epochs', type=int, metavar='LR',
+                        help='epochs to train')
+
     # Dataset parameters
     parser.add_argument('--data_path', default='./data/ISCXVPN2016_MFR', type=str,
                         help='dataset path')
@@ -183,6 +187,7 @@ def main(args):
 
     epochs = int(args.steps / len(data_loader_train)) + 1
 
+    args.epochs = epochs
     print(f"Start training for {args.steps} steps")
     start_time = time.time()
     for epoch in range(0, epochs):
