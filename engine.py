@@ -128,6 +128,8 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             outputs = model(samples)
             
             # debug
+            outputs = F.softmax(outputs, dim=1)
+            
             print(outputs.shape)
             print(targets.shape)
             
