@@ -130,7 +130,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             print(targets.shape)
                 
         with torch.cuda.amp.autocast():
-            
+            import ipdb; ipdb.set_trace()
             outputs = model(samples)
                         
             # debug
