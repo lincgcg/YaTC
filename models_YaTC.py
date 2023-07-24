@@ -91,6 +91,8 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         x = x.mean(dim=1)
 
         outcome = self.fc_norm(x)
+        outcome = outcome.reshape(x.shape[0], 1, x.shape[1])
+
         return outcome
 
 
