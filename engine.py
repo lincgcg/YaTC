@@ -118,6 +118,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             lr_sched.adjust_learning_rate(optimizer, data_iter_step / len(data_loader) + epoch, args)
 
         samples = samples.to(device, non_blocking=True)
+        print(samples.shape)
         targets = targets.to(device, non_blocking=True)
 
         if mixup_fn is not None:
