@@ -45,6 +45,9 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         del self.norm  # remove the original norm
 
     def forward_packet_features(self, x, i):
+        print("inter forward_packet_features")
+        print(x.shape)
+        
         B = x.shape[0]
         x = self.patch_embed(x)
 
@@ -67,6 +70,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         x = torch.cat((cls, x), dim=1)
 
         x =  self.fc_norm(x)
+        print(x.shape)
 
         return x
 
