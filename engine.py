@@ -124,17 +124,24 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
         if mixup_fn is not None:
             samples, targets = mixup_fn(samples, targets)
+            
+            print("before")
+            print(samples.shape)
+            print(targets.shape)
                 
         with torch.cuda.amp.autocast():
+            
             outputs = model(samples)
-            
-            print(outputs)
-            
+                        
             # debug
             # outputs = F.softmax(outputs, dim=1)
             
             # print(outputs.shape)
             # print(targets.shape)
+            
+            print("after")
+            print(samples.shape)
+            print(targets.shape)
             
             loss = criterion(outputs, targets)
 
