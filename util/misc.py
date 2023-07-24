@@ -204,6 +204,13 @@ def save_on_master(*args, **kwargs):
 
 def init_distributed_mode(args):
     if args.dist_on_itp:
+        
+        # import os
+
+        # 获取所有环境变量和值
+        for key, value in os.environ.items():
+            print(f"{key}: {value}")
+        
         args.rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
         args.world_size = int(os.environ['OMPI_COMM_WORLD_SIZE'])
         args.gpu = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
