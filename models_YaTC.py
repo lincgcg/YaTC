@@ -45,8 +45,6 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         del self.norm  # remove the original norm
 
     def forward_packet_features(self, x, i):
-        print("inter forward_packet_features")
-        print(x.shape)
         
         B = x.shape[0]
         x = self.patch_embed(x)
@@ -70,14 +68,10 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         x = torch.cat((cls, x), dim=1)
 
         x =  self.fc_norm(x)
-        print(x.shape)
-        print("end forward_packet_features")
         return x
 
     def forward_features(self, x):
-        print("inter forward_features")
-        print(x.shape)
-        
+
         B, C, H, W = x.shape
         x = x.reshape(B, C, 5, -1)
         for i in range(5):
@@ -97,8 +91,6 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         x = x.mean(dim=1)
 
         outcome = self.fc_norm(x)
-        print(x.shape)
-        print("end forward_features")
         return outcome
 
 
