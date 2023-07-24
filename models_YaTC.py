@@ -71,10 +71,13 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
         x =  self.fc_norm(x)
         print(x.shape)
-
+        print("end forward_packet_features")
         return x
 
     def forward_features(self, x):
+        print("inter forward_features")
+        print(x.shape)
+        
         B, C, H, W = x.shape
         x = x.reshape(B, C, 5, -1)
         for i in range(5):
@@ -94,6 +97,8 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         x = x.mean(dim=1)
 
         outcome = self.fc_norm(x)
+        print(x.shape)
+        print("end forward_features")
         return outcome
 
 
