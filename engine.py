@@ -6,7 +6,7 @@ import torch
 
 from timm.data import Mixup
 from timm.utils import accuracy
-import torch.nn.functional as F
+# import torch.nn.functional as F
 
 import util.misc as misc
 import util.lr_sched as lr_sched
@@ -129,7 +129,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             outputs = model(samples)
             
             # debug
-            outputs = F.softmax(outputs, dim=1)
+            # outputs = F.softmax(outputs, dim=1)
             
             print(outputs.shape)
             print(targets.shape)

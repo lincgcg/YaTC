@@ -37,7 +37,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         super(TrafficTransformer, self).__init__(**kwargs)
 
         self.patch_embed = PatchEmbed(img_size=kwargs['img_size'], patch_size=kwargs['patch_size'],
-                                         in_chans=kwargs['in_chans'], embed_dim=kwargs['embed_dim'])
+                                            in_chans=kwargs['in_chans'], embed_dim=kwargs['embed_dim'])
 
         norm_layer = kwargs['norm_layer']
         embed_dim = kwargs['embed_dim']
@@ -66,7 +66,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         x = x.reshape(B, 4, 20, -1).mean(axis=1)
         x = torch.cat((cls, x), dim=1)
 
-        self.fc_norm(x)
+        x =  self.fc_norm(x)
 
         return x
 
