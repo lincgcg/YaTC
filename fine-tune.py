@@ -139,7 +139,7 @@ def get_args_parser():
 
     return parser
 
-def build_dataset(is_train, args):
+def build_dataset(is_train, is_test , args):
     mean = [0.5]
     std = [0.5]
 
@@ -148,7 +148,13 @@ def build_dataset(is_train, args):
         transforms.ToTensor(),
         transforms.Normalize(mean, std),
     ])
-    root = os.path.join(args.data_path, 'train' if is_train else 'test')
+    root = ''
+    if is_train:
+        root = os.path.join(args.data_path, 'train')
+    elif is_test:
+        root = os.path.join(args.data_path, 'test')
+    else :
+        root = os.path.join(args.data_path, "valid")
     dataset = datasets.ImageFolder(root, transform=transform)
 
     print(dataset)
@@ -170,10 +176,11 @@ def main(args):
 
     cudnn.benchmark = True
 
-    dataset_train = build_dataset(is_train=True, args=args)
-    dataset_val = build_dataset(is_train=False, args=args)
+    dataset_train = build_dataset(is_train=True, is_test=False, args=args)
+    dataset_val = build_dataset(is_train=False, is_test=False, args=args)
+    dataset_test = build_dataset(is_train=False, is_test=True, args=args)
 
-    labels = dataset_val.classes
+    labels = dataset_test.classes
 
     if True:  # args.distributed:
         num_tasks = misc.get_world_size()
@@ -183,18 +190,18 @@ def main(args):
         )
         print("Sampler_train = %s" % str(sampler_train))
         if args.dist_eval:
-            if len(dataset_val) % num_tasks != 0:
+            if len(dataset_test) % num_tasks != 0:
                 print('Warning: Enabling distributed evaluation with an eval dataset not divisible by process number. '
                       'This will slightly alter validation results as extra duplicate entries are added to achieve '
                       'equal num of samples per-process.')
-            sampler_val = torch.utils.data.DistributedSampler(
-                dataset_val, num_replicas=num_tasks, rank=global_rank,
+            sampler_test = torch.utils.data.DistributedSampler(
+                dataset_test, num_replicas=num_tasks, rank=global_rank,
                 shuffle=True)  # shuffle=True to reduce monitor bias
         else:
-            sampler_val = torch.utils.data.SequentialSampler(dataset_val)
+            sampler_test = torch.utils.data.SequentialSampler(dataset_test)
     else:
         sampler_train = torch.utils.data.RandomSampler(dataset_train)
-        sampler_val = torch.utils.data.SequentialSampler(dataset_val)
+        sampler_test = torch.utils.data.SequentialSampler(dataset_test)
 
     if global_rank == 0 and args.log_dir is not None and not args.eval:
         os.makedirs(args.log_dir, exist_ok=True)
@@ -212,6 +219,14 @@ def main(args):
 
     data_loader_val = torch.utils.data.DataLoader(
         dataset_val, sampler=sampler_val,
+        batch_size=args.batch_size,
+        num_workers=args.num_workers,
+        pin_memory=args.pin_mem,
+        drop_last=False
+    )
+    
+    data_loader_test = torch.utils.data.DataLoader(
+        dataset_test, sampler=sampler_test,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
         pin_memory=args.pin_mem,
@@ -296,8 +311,8 @@ def main(args):
     misc.load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
 
     if args.eval:
-        test_stats = evaluate(data_loader_val, model, device)
-        print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.1f}%")
+        test_stats = evaluate(data_loader_test, model, device, is_test = True)
+        print(f"Accuracy of the network on the {len(dataset_test)} valid images: {test_stats['acc1']:.1f}%")
         exit(0)
 
     print(f"Start training for {args.epochs} epochs")
@@ -316,23 +331,37 @@ def main(args):
             args=args
         )
 
-        test_stats = evaluate(data_loader_val, model, device)
+        test_stats = evaluate(data_loader_val, model, device, is_test = True)
 
-        print(f"Accuracy of the network on the {len(dataset_val)} test images: {test_stats['acc1']:.4f}")
-        max_accuracy = max(max_accuracy, test_stats["acc1"])
-        print(f"F1 of the network on the {len(dataset_val)} test images: {test_stats['macro_f1']:.4f}")
-        max_f1 = max(max_f1, test_stats["macro_f1"])
+        print(f"Accuracy of the network on the {len(dataset_val)} valid images: {valid_stats['acc1']:.4f}")
+        max_accuracy = max(max_accuracy, valid_stats["acc1"])
+        print(f"F1 of the network on the {len(dataset_val)} valid images: {valid_stats['macro_f1']:.4f}")
+        max_f1 = max(max_f1, valid_stats["macro_f1"])
         print(f'Max Accuracy: {max_accuracy:.4f}')
         print(f'Max F1: {max_f1:.4f}')
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
-                     **{f'test_{k}': v for k, v in test_stats.items()},
+                     **{f'valid_{k}': v for k, v in valid_stats.items()},
                         'epoch': epoch,
                         'n_parameters': n_parameters}
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
+    # 进入test stage
+    test_stats = evaluate(data_loader_test, model, device)
+
+    print(f"Accuracy of the network on the {len(dataset_test)} valid images: {test_stats['acc1']:.4f}")
+    max_accuracy = max(max_accuracy, test_stats["acc1"])
+    print(f"F1 of the network on the {len(dataset_test)} valid images: {test_stats['macro_f1']:.4f}")
+    max_f1 = max(max_f1, test_stats["macro_f1"])
+    print(f'Max Accuracy: {max_accuracy:.4f}')
+    print(f'Max F1: {max_f1:.4f}')
+
+    log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
+                    **{f'valid_{k}': v for k, v in test_stats.items()},
+                    'epoch': epoch,
+                    'n_parameters': n_parameters}
 
 
 if __name__ == '__main__':

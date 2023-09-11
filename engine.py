@@ -189,11 +189,15 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
 
 @torch.no_grad()
-def evaluate(data_loader, model, device):
+def evaluate(data_loader, model, device, is_test = False):
     criterion = torch.nn.CrossEntropyLoss()
 
     metric_logger = misc.MetricLogger(delimiter="  ")
-    header = 'Test:'
+    header = ''
+    if is_test:
+        header = 'Test:'
+    else :
+        header = 'Valid:'
 
     # switch to evaluation mode
     model.eval()

@@ -211,9 +211,6 @@ def init_distributed_mode(args):
     if args.dist_on_itp:
         
         # import os
-
-        
-        
         args.rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
         args.world_size = int(os.environ['OMPI_COMM_WORLD_SIZE'])
         args.gpu = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
