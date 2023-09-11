@@ -237,7 +237,7 @@ def evaluate(data_loader, model, device, is_test = False):
     print('* Acc@1 {top1.global_avg:.4f} Acc@5 {top5.global_avg:.4f} loss {losses.global_avg:.4f}'
             .format(top1=metric_logger.acc1, top5=metric_logger.acc5, losses=metric_logger.loss))
     print(
-        '* Pre {macro_pre:.4f} Rec {macro_rec:.4f} F1 {macro_f1:.4f}'
+        '* Precision {macro_pre:.4f} Recall {macro_rec:.4f} F1 {macro_f1:.4f}'
         .format(macro_pre=macro[0], macro_rec=macro[1],
                     macro_f1=macro[2]))
 

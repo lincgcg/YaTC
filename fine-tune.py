@@ -219,7 +219,7 @@ def main(args):
 
     data_loader_val = torch.utils.data.DataLoader(
         dataset_val, sampler=sampler_val,
-        batch_size=args.batch_size,
+        batch_size=len(dataset_val),
         num_workers=args.num_workers,
         pin_memory=args.pin_mem,
         drop_last=False
@@ -227,7 +227,7 @@ def main(args):
     
     data_loader_test = torch.utils.data.DataLoader(
         dataset_test, sampler=sampler_test,
-        batch_size=args.batch_size,
+        batch_sizelen(dataset_test)
         num_workers=args.num_workers,
         pin_memory=args.pin_mem,
         drop_last=False
@@ -331,14 +331,10 @@ def main(args):
             args=args
         )
 
-        test_stats = evaluate(data_loader_val, model, device, is_test = True)
+        valid_stats = evaluate(data_loader_val, model, device, is_test = True)
 
         print(f"Accuracy of the network on the {len(dataset_val)} valid images: {valid_stats['acc1']:.4f}")
-        max_accuracy = max(max_accuracy, valid_stats["acc1"])
         print(f"F1 of the network on the {len(dataset_val)} valid images: {valid_stats['macro_f1']:.4f}")
-        max_f1 = max(max_f1, valid_stats["macro_f1"])
-        print(f'Max Accuracy: {max_accuracy:.4f}')
-        print(f'Max F1: {max_f1:.4f}')
 
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                      **{f'valid_{k}': v for k, v in valid_stats.items()},
@@ -352,11 +348,8 @@ def main(args):
     test_stats = evaluate(data_loader_test, model, device)
 
     print(f"Accuracy of the network on the {len(dataset_test)} valid images: {test_stats['acc1']:.4f}")
-    max_accuracy = max(max_accuracy, test_stats["acc1"])
     print(f"F1 of the network on the {len(dataset_test)} valid images: {test_stats['macro_f1']:.4f}")
-    max_f1 = max(max_f1, test_stats["macro_f1"])
-    print(f'Max Accuracy: {max_accuracy:.4f}')
-    print(f'Max F1: {max_f1:.4f}')
+
 
     log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                     **{f'valid_{k}': v for k, v in test_stats.items()},
