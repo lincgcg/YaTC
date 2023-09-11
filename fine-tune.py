@@ -222,7 +222,7 @@ def main(args):
     )
 
     data_loader_val = torch.utils.data.DataLoader(
-        dataset_test, sampler=sampler_val,
+        dataset_val, sampler=sampler_val,
         batch_size = len(dataset_val),
         num_workers=args.num_workers,
         pin_memory=args.pin_mem,
@@ -351,8 +351,8 @@ def main(args):
     # 进入test stage
     test_stats = evaluate(data_loader_test, model, device)
 
-    print(f"Accuracy of the network on the {len(dataset_test)} valid images: {test_stats['acc1']:.4f}")
-    print(f"F1 of the network on the {len(dataset_test)} valid images: {test_stats['macro_f1']:.4f}")
+    print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.4f}")
+    print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
 
 
     log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
