@@ -219,7 +219,7 @@ def main(args):
 
     data_loader_val = torch.utils.data.DataLoader(
         dataset_val, sampler=sampler_val,
-        batch_size=len(dataset_val),
+        batch_size = len(dataset_val),
         num_workers=args.num_workers,
         pin_memory=args.pin_mem,
         drop_last=False
@@ -227,7 +227,7 @@ def main(args):
     
     data_loader_test = torch.utils.data.DataLoader(
         dataset_test, sampler=sampler_test,
-        batch_sizelen(dataset_test),
+        batch_size = len(dataset_test),
         num_workers=args.num_workers,
         pin_memory=args.pin_mem,
         drop_last=False
