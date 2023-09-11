@@ -188,6 +188,9 @@ def main(args):
         sampler_train = torch.utils.data.DistributedSampler(
             dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
         )
+        sampler_val = torch.utils.data.DistributedSampler(
+            dataset_val, num_replicas=num_tasks, rank=global_rank, shuffle=True
+        )
         print("Sampler_train = %s" % str(sampler_train))
         if args.dist_eval:
             if len(dataset_test) % num_tasks != 0:
