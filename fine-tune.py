@@ -202,6 +202,7 @@ def main(args):
     else:
         sampler_train = torch.utils.data.RandomSampler(dataset_train)
         sampler_test = torch.utils.data.SequentialSampler(dataset_test)
+        sampler_valid = torch.utils.data.SequentialSampler(dataset_valid)
 
     if global_rank == 0 and args.log_dir is not None and not args.eval:
         os.makedirs(args.log_dir, exist_ok=True)
