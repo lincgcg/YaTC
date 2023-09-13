@@ -249,7 +249,7 @@ def evaluate(data_loader, model, device, is_test = False, prf_path = None):
             f2.write('\n')
         f2.close()
         
-        print(classification_report(target_all, pred_all, target_names=range(cm.shape[0])))
+        print(classification_report(target_all, pred_all, target_names=[str(i) for i in range(cm.shape[0])]))
 
         
         
