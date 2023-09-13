@@ -252,9 +252,6 @@ def evaluate(data_loader, model, device, is_test = False, prf_path = None):
         
         print(classification_report(target_all, pred_all, target_names=[str(i) for i in range(cm.shape[0])], digits = 6))
 
-        
-        
-        
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
     print('* Acc@1 {top1.global_avg:.4f} Acc@5 {top5.global_avg:.4f} loss {losses.global_avg:.4f}'
