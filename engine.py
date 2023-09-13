@@ -11,7 +11,7 @@ from timm.utils import accuracy
 import util.misc as misc
 import util.lr_sched as lr_sched
 
-from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, classification_report
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -248,6 +248,10 @@ def evaluate(data_loader, model, device, is_test = False, prf_path = None):
             f2.write(',' + ','.join([str(p),str(r),str(f1)]))
             f2.write('\n')
         f2.close()
+        
+        print(classification_report(target_all, pred_all, target_names=range(cm.shape[0])))
+
+        
         
         
     # gather the stats from all processes
