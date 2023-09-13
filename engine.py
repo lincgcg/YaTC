@@ -15,7 +15,7 @@ from sklearn.metrics import accuracy_score, precision_recall_fscore_support, con
 
 import matplotlib.pyplot as plt
 import numpy as np
-
+import os
 
 def pretrain_one_epoch(model: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
@@ -189,7 +189,7 @@ def train_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
 
 @torch.no_grad()
-def evaluate(data_loader, model, device, is_test = False):
+def evaluate(data_loader, model, device, is_test = False, prf_path = None):
     criterion = torch.nn.CrossEntropyLoss()
 
     metric_logger = misc.MetricLogger(delimiter="  ")
@@ -231,7 +231,25 @@ def evaluate(data_loader, model, device, is_test = False):
 
     macro = precision_recall_fscore_support(target_all, pred_all, average='weighted')
     cm = confusion_matrix(target_all, pred_all)
-
+    
+    # 写prf.csv文件
+    if is_test:
+        eps = 1e-9
+        filename = os.path.join(prf_path, "prf.csv")
+        f2 = open(filename,"w+")
+        f2.write('Label num')
+        f2.write(',' + ','.join(["Precision","Recall","F1"]))
+        f2.write('\n')
+        for i in range(cm.shape[0]):
+            p = cm[i, i] / (sum(cm[:, i]) + eps)
+            r = cm[i, i] / (sum(cm[i, :]) + eps)
+            f1 = 2 * p * r / (p + r + eps)
+            f2.write(str(i))
+            f2.write(',' + ','.join([str(p),str(r),str(f1)]))
+            f2.write('\n')
+        f2.close()
+        
+        
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
     print('* Acc@1 {top1.global_avg:.4f} Acc@5 {top5.global_avg:.4f} loss {losses.global_avg:.4f}'

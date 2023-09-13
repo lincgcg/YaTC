@@ -315,8 +315,8 @@ def main(args):
     misc.load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
 
     if args.eval:
-        test_stats = evaluate(data_loader_test, model, device, is_test = True)
-        print(f"Accuracy of the network on the {len(dataset_test)} valid images: {test_stats['acc1']:.1f}%")
+        test_stats = evaluate(data_loader_test, model, device, is_test = True, prf_path = args.log_dir)
+        print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.1f}%")
         exit(0)
 
     print(f"Start training for {args.epochs} epochs")
@@ -335,7 +335,7 @@ def main(args):
             args=args
         )
 
-        valid_stats = evaluate(data_loader_val, model, device, is_test = True)
+        valid_stats = evaluate(data_loader_val, model, device)
 
         print(f"Accuracy of the network on the {len(dataset_val)} valid images: {valid_stats['acc1']:.4f}")
         print(f"F1 of the network on the {len(dataset_val)} valid images: {valid_stats['macro_f1']:.4f}")
@@ -349,7 +349,7 @@ def main(args):
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
     # 进入test stage
-    test_stats = evaluate(data_loader_test, model, device)
+    test_stats = evaluate(data_loader_test, model, device, is_test = True, prf_path = args.log_dir)
 
     print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.4f}")
     print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
