@@ -345,6 +345,8 @@ def main(args):
     optimizer = torch.optim.AdamW(param_groups, lr=args.lr)
     loss_scaler = NativeScaler()
 
+    mixup_fn = None
+
     # if mixup_fn is not None:
     #     # smoothing is handled with mixup label transform
     #     criterion = SoftTargetCrossEntropy()
