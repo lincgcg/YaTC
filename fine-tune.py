@@ -139,6 +139,11 @@ def get_args_parser():
     parser.add_argument('--dist_url', default='env://',
                         help='url used to set up distributed training')
 
+    # wandb
+    parser.add_argument("--project_name", type=str, default="YaTC",
+                        help="name of project")
+    parser.add_argument("--name", type=str, default="demo",
+                        help="name of process")
     return parser
 
 def build_dataset(is_train, is_test , args):
@@ -370,6 +375,11 @@ def main(args):
     print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.4f}")
     print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
 
+
+    wandb.log({"AC": test_stats['acc1']})
+    wandb.log({"PR": test_state['macro_pre']})
+    wandb.log({"RC": test_state['macro_rec']})
+    wandb.log({"F1": test_state['macro_f1']})
 
     log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                     **{f'valid_{k}': v for k, v in test_stats.items()},
