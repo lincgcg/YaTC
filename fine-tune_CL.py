@@ -33,6 +33,7 @@ import models_YaTC
 from engine import train_one_epoch, evaluate, CL_one_epoch
 import torch.nn as nn
 import torch.nn.functional as F
+from PIL import Image
 
 class ContrastiveLoss(nn.Module):
     def __init__(self, temperature=0.1):
