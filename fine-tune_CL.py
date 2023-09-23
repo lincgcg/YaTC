@@ -31,7 +31,8 @@ from util.misc import NativeScalerWithGradNormCount as NativeScaler
 import models_YaTC
 
 from engine import train_one_epoch, evaluate, CL_one_epoch
-
+import torch.nn as nn
+import torch.nn.functional as F
 
 class ContrastiveLoss(nn.Module):
     def __init__(self, temperature=0.1):
