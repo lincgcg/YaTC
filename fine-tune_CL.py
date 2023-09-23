@@ -123,7 +123,8 @@ class CustomImageFolder(Dataset):
         # 例如，如果文件名是 target_image.jpg, 你可以这样做：
         png_filename = os.path.basename(file_path)
         parts = png_filename.split("_")
-        name = parts[0]
+        parts = parts[:-1]
+        name = "_".join(parts)
         return name
 
 def get_args_parser():
