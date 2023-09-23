@@ -42,6 +42,7 @@ class ContrastiveLoss(nn.Module):
         self.temperature = temperature
 
     def forward(self, representations, pseudo_labels):
+        representations = F.normalize(representations, p=2, dim=1)
         # representations = representations / 100.0
 
         # Calculate similarity matrix using dot product

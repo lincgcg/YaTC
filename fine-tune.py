@@ -31,6 +31,8 @@ import models_YaTC
 
 from engine import train_one_epoch, evaluate
 
+import wandb
+
 
 def get_args_parser():
     parser = argparse.ArgumentParser('YaTC fine-tuning for traffic classification', add_help=False)
@@ -162,6 +164,20 @@ def build_dataset(is_train, is_test , args):
     return dataset
 
 def main(args):
+    
+    # 初始化wandb
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project = args.project_name,
+        name = args.name,
+        # track hyperparameters and run metadata
+        config={
+            "epoch_num": args.epochs,
+            "log_dir": args.log_dir,
+            "data_path": args.data_path
+        }
+    )
+    
     misc.init_distributed_mode(args)
 
     print('job dir: {}'.format(os.path.dirname(os.path.realpath(__file__))))
