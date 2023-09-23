@@ -192,6 +192,7 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
                     data_loader: Iterable, optimizer: torch.optim.Optimizer,
                     device: torch.device, epoch: int, loss_scaler, max_norm: float = 0,
                     mixup_fn: Optional[Mixup] = None, log_writer=None,
+                    model_without_ddp = None,
                     args=None):
     model.train(True)
     metric_logger = misc.MetricLogger(delimiter="  ")
@@ -260,7 +261,7 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     print("Averaged stats:", metric_logger)
     if (epoch + 1) % 10 == 0:
         misc.save_model(
-            args=args, model=model, model_without_ddp=model, optimizer=optimizer,
+            args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
             loss_scaler=loss_scaler, epoch=epoch, name='epoch'+str(epoch+1))
 
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}

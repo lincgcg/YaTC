@@ -361,6 +361,7 @@ def main(args):
             optimizer, device, epoch, loss_scaler,
             args.clip_grad, mixup_fn,
             log_writer=log_writer,
+            model_without_ddp = model_without_ddp,
             args=args
         )
 
