@@ -377,9 +377,9 @@ def main(args):
 
 
     wandb.log({"AC": test_stats['acc1']})
-    wandb.log({"PR": test_state['macro_pre']})
-    wandb.log({"RC": test_state['macro_rec']})
-    wandb.log({"F1": test_state['macro_f1']})
+    wandb.log({"PR": test_stats['macro_pre']})
+    wandb.log({"RC": test_stats['macro_rec']})
+    wandb.log({"F1": test_stats['macro_f1']})
 
     log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                     **{f'valid_{k}': v for k, v in test_stats.items()},
