@@ -310,7 +310,7 @@ def main(args):
         trunc_normal_(model.head.weight, std=2e-5)
 
     model.to(device)
-    odel_without_ddp = model
+    model_without_ddp = model
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     print("Model = %s" % str(model_without_ddp))
