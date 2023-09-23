@@ -285,6 +285,7 @@ def main(args):
     )
 
     model = models_YaTC.__dict__[args.model](
+        num_classes=args.nb_classes,
         drop_path_rate=args.drop_path,
     )
 
