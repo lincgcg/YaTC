@@ -311,7 +311,6 @@ def main(args):
 
     model.to(device)
 
-    model_without_ddp = model.module
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     print("Model = %s" % str(model_without_ddp))
@@ -329,6 +328,8 @@ def main(args):
     print("effective batch size: %d" % eff_batch_size)
 
     model = torch.nn.DataParallel(model)
+    model_without_ddp = model.module
+
     # build optimizer with layer-wise lr decay (lrd)
     param_groups = lrd.param_groups_lrd(model_without_ddp, args.weight_decay,
                                         no_weight_decay_list=model_without_ddp.no_weight_decay(),
