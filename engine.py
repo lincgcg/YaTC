@@ -259,6 +259,10 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     # gather the stats from all processes
     metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
+    if (epoch + 1) % 10 == 0:
+        misc.save_model(
+            args=args, model=model, model_without_ddp=model, optimizer=optimizer,
+            loss_scaler=loss_scaler, epoch=epoch, name='epoch'+str(epoch))
 
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
