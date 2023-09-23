@@ -226,7 +226,10 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         with torch.cuda.amp.autocast():
 
             outputs = model(samples)
-
+            print("outputs")
+            print(outputs.shape)
+            print(outputs)
+            
             all_output = torch.cat([features_chunk for features_chunk in outputs.split(samples.size(0) // torch.cuda.device_count(), dim=0)], dim=0)
             all_targets = torch.cat([features_chunk for features_chunk in targets.split(targets.size(0) // torch.cuda.device_count(), dim=0)], dim=0)
             loss = criterion(all_output, all_targets)
