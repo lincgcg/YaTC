@@ -104,6 +104,14 @@ class CustomImageFolder(Dataset):
         name = self.get_name_from_filename(img_path)
         target = self.string_to_value[name]
         
+        # test for name
+        print("img_path")
+        print(img_path)
+        print("name")
+        print(name)
+        print("target")
+        print(target)
+        
         # 应用变换
         if self.transform:
             image = self.transform(image)
@@ -311,7 +319,7 @@ def main(args):
 
     model.to(device)
 
-    model_without_ddp = model.module
+    model_without_ddp = model
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
     print("Model = %s" % str(model_without_ddp))
