@@ -216,7 +216,13 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
         samples = samples.to(device, non_blocking=True)
         targets = targets.to(device, non_blocking=True)
 
-                
+        print("samples")
+        print(samples.shape)
+        print(samples)
+        print("targets")
+        print(targets.shape)
+        print(targets)
+
         with torch.cuda.amp.autocast():
 
             outputs = model(samples)
