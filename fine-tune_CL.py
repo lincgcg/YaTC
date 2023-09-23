@@ -20,6 +20,7 @@ from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 
 import os
 import PIL
+import tqdm
 
 from torchvision import datasets, transforms
 
@@ -349,7 +350,7 @@ def main(args):
     max_accuracy = 0.0
     max_f1 = 0.0
 
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in tqdm.tqdm(range(args.start_epoch, args.epochs)):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
         train_stats = CL_one_epoch(

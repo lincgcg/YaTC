@@ -222,7 +222,6 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
 
             all_output = torch.cat([features_chunk for features_chunk in outputs.split(samples.size(0) // torch.cuda.device_count(), dim=0)], dim=0)
             all_targets = torch.cat([features_chunk for features_chunk in targets.split(targets.size(0) // torch.cuda.device_count(), dim=0)], dim=0)
-            print(all_output.shape)
             loss = criterion(all_output, all_targets)
 
 
@@ -262,7 +261,7 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
     if (epoch + 1) % 10 == 0:
         misc.save_model(
             args=args, model=model, model_without_ddp=model, optimizer=optimizer,
-            loss_scaler=loss_scaler, epoch=epoch, name='epoch'+str(epoch))
+            loss_scaler=loss_scaler, epoch=epoch, name='epoch'+str(epoch+1))
 
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
 
