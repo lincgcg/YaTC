@@ -97,7 +97,7 @@ class CustomImageFolder(Dataset):
         image = Image.open(img_path)
         
         # 从图像文件名中获取目标（target）
-        name = self.get_name_from_filename(img_path):
+        name = self.get_name_from_filename(img_path)
         target = self.string_to_value[name]
         
         # 应用变换
