@@ -44,7 +44,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         self.fc_norm = norm_layer(embed_dim)
         
         self.PH_1_linear = nn.Linear(192, 192)
-        self.PH_1_relu = nn.RELU()
+        self.PH_1_relu = nn.ReLU()
         
         del self.norm  # remove the original norm
 
