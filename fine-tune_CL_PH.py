@@ -312,7 +312,7 @@ def main(args):
         print(msg)
 
         # manually initialize fc layer
-        trunc_normal_(model.CL_linear.weight, std=2e-5)
+        trunc_normal_(model.head.weight, std=2e-5)
 
     model.to(device)
     model_without_ddp = model
