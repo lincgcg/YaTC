@@ -27,7 +27,7 @@ import util.misc as misc
 from util.pos_embed import interpolate_pos_embed
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
-import models_YaTC
+import models_YaTC_CL_PH
 
 from engine import train_one_epoch, evaluate
 
