@@ -99,6 +99,10 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
         return outcome
 
+    def forward_head(self, x, pre_logits: bool = False):
+        x = self.fc_norm(x)
+        x = self.head_drop(x)
+        return x if pre_logits else self.head(x)
 
     def forward_PH(self, x):
         if self.global_pool:
