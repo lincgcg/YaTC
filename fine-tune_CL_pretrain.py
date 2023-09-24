@@ -29,7 +29,7 @@ import util.misc as misc
 from util.pos_embed import interpolate_pos_embed
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
-import models_YaTC_CL
+import models_YaTC_onlyPH
 
 from engine import train_one_epoch, evaluate, CL_one_epoch
 import torch.nn as nn
@@ -292,7 +292,10 @@ def main(args):
         drop_last=True,
     )
 
-    model = models_YaTC_CL.__dict__[args.model](num_classes=args.nb_classes)
+    model = models_YaTC_onlyPH.__dict__[args.model](
+        num_classes=args.nb_classes,
+        drop_path_rate=args.drop_path,
+    )
 
     if args.finetune and not args.eval:
         checkpoint = torch.load(args.finetune, map_location='cpu')
