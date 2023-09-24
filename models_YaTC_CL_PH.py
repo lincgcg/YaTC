@@ -73,7 +73,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         x = x.reshape(B, 4, 20, -1).mean(axis=1)
         x = torch.cat((cls, x), dim=1)
 
-        x =  self.fc_norm(x)
+        # x =  self.fc_norm(x)
         return x
 
     def forward_features(self, x):
