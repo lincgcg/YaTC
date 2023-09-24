@@ -103,6 +103,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
     def forward_PH(self, x):
         x = self.fc_norm(x)
         x = self.PH_1_relu(self.PH_1_linear(x))
+        return x
 
     def forward(self, x):
         x = self.forward_features(x)
