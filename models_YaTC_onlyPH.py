@@ -101,6 +101,8 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
 
     def forward_PH(self, x):
+        if self.global_pool:
+            x = x[:, self.num_prefix_tokens:].mean(dim=1) if self.global_pool == 'avg' else x[:, 0]
         x = self.fc_norm(x)
         x = self.PH_1_relu(self.PH_1_linear(x))
         return x
