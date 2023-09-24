@@ -43,7 +43,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         embed_dim = kwargs['embed_dim']
         self.fc_norm = norm_layer(embed_dim)
         
-        self.PH_1_linear = nn.Linear(192, 192)
+        self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
         self.PH_1_relu = nn.ReLU()
         
         del self.norm  # remove the original norm
@@ -96,10 +96,19 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
         outcome = self.fc_norm(x)
         outcome = outcome.reshape(x.shape[0], 1, x.shape[1])
-        outcome = self.PH_1_relu(self.PH_1_linear(outcome))
 
         return outcome
 
+
+    def forward_PH(self, x):
+        x = self.fc_norm(x)
+        x = self.PH_1_relu(self.PH_1_linear(x))
+
+    def forward(self, x):
+        x = self.forward_features(x)
+        x = self.forward_PH(x)
+        # x = self.forward_head(x)
+        return x
 
 class MaskedAutoencoder(nn.Module):
     """ Masked Autoencoder

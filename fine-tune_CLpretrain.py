@@ -27,7 +27,7 @@ import util.misc as misc
 from util.pos_embed import interpolate_pos_embed
 from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
-import models_YaTC_CL_PH
+import models_YaTC_onlyPH
 
 from engine import train_one_epoch, evaluate
 
@@ -267,7 +267,7 @@ def main(args):
             prob=args.mixup_prob, switch_prob=args.mixup_switch_prob, mode=args.mixup_mode,
             label_smoothing=args.smoothing, num_classes=args.nb_classes)
 
-    model = models_YaTC_CL_PH.__dict__[args.model](
+    model = models_YaTC_onlyPH.__dict__[args.model](
         num_classes=args.nb_classes,
         drop_path_rate=args.drop_path,
     )
