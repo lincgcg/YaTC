@@ -11,6 +11,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.tensorboard import SummaryWriter
 
 import timm
+from torch.utils.data import Dataset
 
 # assert timm.__version__ == "0.3.2"  # version check
 from timm.models.layers import trunc_normal_
@@ -19,6 +20,7 @@ from timm.loss import LabelSmoothingCrossEntropy, SoftTargetCrossEntropy
 
 import os
 import PIL
+import tqdm
 
 from torchvision import datasets, transforms
 
@@ -29,10 +31,100 @@ from util.misc import NativeScalerWithGradNormCount as NativeScaler
 
 import models_YaTC_CL
 
-from engine import train_one_epoch, evaluate
+from engine import train_one_epoch, evaluate, CL_one_epoch
+import torch.nn as nn
+import torch.nn.functional as F
+from PIL import Image
 
-import wandb
+class ContrastiveLoss(nn.Module):
+    def __init__(self, temperature=0.1):
+        super(ContrastiveLoss, self).__init__()
+        self.temperature = temperature
 
+    def forward(self, representations, pseudo_labels):
+        representations = F.normalize(representations, p=2, dim=1)
+        # representations = representations / 100.0
+
+        # Calculate similarity matrix using dot product
+        sim_matrix = torch.matmul(representations, representations.t())
+
+        # Get positive and negative mask
+        positive_mask = (pseudo_labels.unsqueeze(1) == pseudo_labels.unsqueeze(0)).float()
+        negative_mask = (pseudo_labels.unsqueeze(1) != pseudo_labels.unsqueeze(0)).float()
+        
+        # Ensure the diagonal is zero for positives
+        positive_mask = positive_mask - torch.diag(positive_mask.diag())
+
+        # Extract positive and negative similarities
+        positive_similarities = sim_matrix * positive_mask
+        negative_similarities = sim_matrix * negative_mask
+
+        # Calculate logit (numerator)
+        numerator = torch.exp(positive_similarities / self.temperature)
+
+        # Calculate logit (denominator)
+        # Here we sum up the negative similarities, and add the positive for numerical stability
+        denominator = torch.sum(torch.exp(negative_similarities / self.temperature), dim=1) + numerator.diag()
+
+        # Compute the loss
+        loss = (-torch.log(numerator.diag() / (denominator + 1e-8))).mean()
+
+        return loss
+
+class CustomImageFolder(Dataset):
+    def __init__(self, root_dir, transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        
+        # 创建一个字典来存储每个字符串及其对应的值
+        self.string_to_value = {}
+        self.next_value = 0  # 起始值
+        
+        # 加载所有图像的路径
+        self.image_paths = []
+        for filename in os.listdir(root_dir):
+            file_path = os.path.join(root_dir, filename)
+            if filename.endswith('.png'):  # 你可以根据你的图像格式调整这一行
+                self.image_paths.append(file_path)
+                # 获取图像base名称
+                name = self.get_name_from_filename(file_path)
+                if name not in self.string_to_value:
+                    self.string_to_value[name] = self.next_value
+                    self.next_value += 1
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, idx):
+        # 加载图像
+        img_path = self.image_paths[idx]
+        image = Image.open(img_path)
+        
+        # 从图像文件名中获取目标（target）
+        name = self.get_name_from_filename(img_path)
+        target = self.string_to_value[name]
+        
+        # print("img_path")
+        # print(img_path)
+        # print("name")
+        # print(name)
+        # print("target")
+        # print(target)
+        
+        # 应用变换
+        if self.transform:
+            image = self.transform(image)
+        
+        return image, target
+    
+    def get_name_from_filename(self, file_path):
+        # 在这里实现你的逻辑来从文件名中解析目标
+        # 例如，如果文件名是 target_image.jpg, 你可以这样做：
+        png_filename = os.path.basename(file_path)
+        parts = png_filename.split("_")
+        parts = parts[:-1]
+        name = "_".join(parts)
+        return name
 
 def get_args_parser():
     parser = argparse.ArgumentParser('YaTC fine-tuning for traffic classification', add_help=False)
@@ -139,14 +231,13 @@ def get_args_parser():
     parser.add_argument('--dist_url', default='env://',
                         help='url used to set up distributed training')
 
-    # wandb
-    parser.add_argument("--project_name", type=str, default="YaTC",
-                        help="name of project")
-    parser.add_argument("--name", type=str, default="demo",
-                        help="name of process")
+    # CL
+    parser.add_argument("--temperature", type=float, default=0.1,
+                        help="temperature")
+
     return parser
 
-def build_dataset(is_train, is_test , args):
+def build_dataset(args):
     mean = [0.5]
     std = [0.5]
 
@@ -155,34 +246,12 @@ def build_dataset(is_train, is_test , args):
         transforms.ToTensor(),
         transforms.Normalize(mean, std),
     ])
-    root = ''
-    if is_train:
-        root = os.path.join(args.data_path, 'train')
-    elif is_test:
-        root = os.path.join(args.data_path, 'test')
-    else :
-        root = os.path.join(args.data_path, "valid")
-    dataset = datasets.ImageFolder(root, transform=transform)
-
-    print(dataset)
+    root = os.path.join(args.data_path, 'train')
+    dataset = CustomImageFolder(root, transform=transform)
 
     return dataset
 
 def main(args):
-    
-    # 初始化wandb
-    wandb.init(
-        # set the wandb project where this run will be logged
-        project = args.project_name,
-        name = args.name,
-        # track hyperparameters and run metadata
-        config={
-            "epoch_num": args.epochs,
-            "log_dir": args.log_dir,
-            "data_path": args.data_path
-        }
-    )
-    
     misc.init_distributed_mode(args)
 
     print('job dir: {}'.format(os.path.dirname(os.path.realpath(__file__))))
@@ -197,11 +266,7 @@ def main(args):
 
     cudnn.benchmark = True
 
-    dataset_train = build_dataset(is_train=True, is_test=False, args=args)
-    dataset_val = build_dataset(is_train=False, is_test=False, args=args)
-    dataset_test = build_dataset(is_train=False, is_test=True, args=args)
-
-    labels = dataset_test.classes
+    dataset_train = build_dataset(args=args)
 
     if True:  # args.distributed:
         num_tasks = misc.get_world_size()
@@ -209,24 +274,9 @@ def main(args):
         sampler_train = torch.utils.data.DistributedSampler(
             dataset_train, num_replicas=num_tasks, rank=global_rank, shuffle=True
         )
-        sampler_val = torch.utils.data.DistributedSampler(
-            dataset_val, num_replicas=num_tasks, rank=global_rank, shuffle=True
-        )
         print("Sampler_train = %s" % str(sampler_train))
-        if args.dist_eval:
-            if len(dataset_test) % num_tasks != 0:
-                print('Warning: Enabling distributed evaluation with an eval dataset not divisible by process number. '
-                      'This will slightly alter validation results as extra duplicate entries are added to achieve '
-                      'equal num of samples per-process.')
-            sampler_test = torch.utils.data.DistributedSampler(
-                dataset_test, num_replicas=num_tasks, rank=global_rank,
-                shuffle=True)  # shuffle=True to reduce monitor bias
-        else:
-            sampler_test = torch.utils.data.SequentialSampler(dataset_test)
     else:
         sampler_train = torch.utils.data.RandomSampler(dataset_train)
-        sampler_test = torch.utils.data.SequentialSampler(dataset_test)
-        sampler_val = torch.utils.data.SequentialSampler(dataset_val)
 
     if global_rank == 0 and args.log_dir is not None and not args.eval:
         os.makedirs(args.log_dir, exist_ok=True)
@@ -241,31 +291,6 @@ def main(args):
         pin_memory=args.pin_mem,
         drop_last=True,
     )
-
-    data_loader_val = torch.utils.data.DataLoader(
-        dataset_val, sampler=sampler_val,
-        batch_size = len(dataset_val),
-        num_workers=args.num_workers,
-        pin_memory=args.pin_mem,
-        drop_last=False
-    )
-    
-    data_loader_test = torch.utils.data.DataLoader(
-        dataset_test, sampler=sampler_test,
-        batch_size = len(dataset_test),
-        num_workers=args.num_workers,
-        pin_memory=args.pin_mem,
-        drop_last=False
-    )
-
-    mixup_fn = None
-    mixup_active = args.mixup > 0 or args.cutmix > 0. or args.cutmix_minmax is not None
-    if mixup_active:
-        print("Mixup is activated!")
-        mixup_fn = Mixup(
-            mixup_alpha=args.mixup, cutmix_alpha=args.cutmix, cutmix_minmax=args.cutmix_minmax,
-            prob=args.mixup_prob, switch_prob=args.mixup_switch_prob, mode=args.mixup_mode,
-            label_smoothing=args.smoothing, num_classes=args.nb_classes)
 
     model = models_YaTC_CL.__dict__[args.model]()
 
@@ -290,7 +315,6 @@ def main(args):
         trunc_normal_(model.head.weight, std=2e-5)
 
     model.to(device)
-
     model_without_ddp = model
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
@@ -308,9 +332,8 @@ def main(args):
     print("accumulate grad iterations: %d" % args.accum_iter)
     print("effective batch size: %d" % eff_batch_size)
 
-    if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
-        model_without_ddp = model.module
+    model = torch.nn.DataParallel(model)
+    model_without_ddp = model.module
 
     # build optimizer with layer-wise lr decay (lrd)
     param_groups = lrd.param_groups_lrd(model_without_ddp, args.weight_decay,
@@ -320,69 +343,40 @@ def main(args):
     optimizer = torch.optim.AdamW(param_groups, lr=args.lr)
     loss_scaler = NativeScaler()
 
-    if mixup_fn is not None:
-        # smoothing is handled with mixup label transform
-        criterion = SoftTargetCrossEntropy()
-    elif args.smoothing > 0.:
-        criterion = LabelSmoothingCrossEntropy(smoothing=args.smoothing)
-    else:
-        criterion = torch.nn.CrossEntropyLoss()
+    mixup_fn = None
+
+
+    criterion = ContrastiveLoss(args.temperature)
 
     print("criterion = %s" % str(criterion))
 
     misc.load_model(args=args, model_without_ddp=model_without_ddp, optimizer=optimizer, loss_scaler=loss_scaler)
 
-    if args.eval:
-        test_stats = evaluate(data_loader_test, model, device, is_test = True, prf_path = args.log_dir)
-        print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.1f}%")
-        exit(0)
 
     print(f"Start training for {args.epochs} epochs")
     start_time = time.time()
     max_accuracy = 0.0
     max_f1 = 0.0
 
-    for epoch in range(args.start_epoch, args.epochs):
+    for epoch in tqdm.tqdm(range(args.start_epoch, args.epochs)):
         if args.distributed:
             data_loader_train.sampler.set_epoch(epoch)
-        train_stats = train_one_epoch(
+        train_stats = CL_one_epoch(
             model, criterion, data_loader_train,
             optimizer, device, epoch, loss_scaler,
             args.clip_grad, mixup_fn,
             log_writer=log_writer,
+            model_without_ddp = model_without_ddp,
             args=args
         )
 
-        valid_stats = evaluate(data_loader_val, model, device)
-
-        print(f"Accuracy of the network on the {len(dataset_val)} valid images: {valid_stats['acc1']:.4f}")
-        print(f"F1 of the network on the {len(dataset_val)} valid images: {valid_stats['macro_f1']:.4f}")
-
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
-                     **{f'valid_{k}': v for k, v in valid_stats.items()},
                         'epoch': epoch,
                         'n_parameters': n_parameters}
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
-    # 进入test stage
-    test_stats = evaluate(data_loader_test, model, device, is_test = True, prf_path = args.log_dir)
-
-    print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.4f}")
-    print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
-
-
-    wandb.log({"AC": test_stats['acc1']})
-    wandb.log({"PR": test_stats['macro_pre']})
-    wandb.log({"RC": test_stats['macro_rec']})
-    wandb.log({"F1": test_stats['macro_f1']})
-
-    log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
-                    **{f'valid_{k}': v for k, v in test_stats.items()},
-                    'epoch': epoch,
-                    'n_parameters': n_parameters}
-
 
 if __name__ == '__main__':
     args = get_args_parser()
