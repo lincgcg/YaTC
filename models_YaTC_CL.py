@@ -96,7 +96,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
         outcome = self.fc_norm(x)
         outcome = outcome.reshape(x.shape[0], 1, x.shape[1])
-        outcome = self.PH_1_Relu(self.PH_1_linear(outcome))
+        outcome = self.PH_1_relu(self.PH_1_linear(outcome))
 
         return outcome
 
