@@ -113,7 +113,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
     def forward(self, x):
         x = self.forward_features(x)
-        x = self.forward_PH(x)
+        # x = self.forward_PH(x)
         x = self.forward_head(x)
         return x
 
