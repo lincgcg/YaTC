@@ -123,7 +123,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # if self.global_pool:
         #     x = x[:, self.num_prefix_tokens:].mean(dim=1) if self.global_pool == 'avg' else x[:, 0]
         # x = self.PH_1_gelu(self.PH_1_linear(x))
-        # return x
+        return x
 
     def forward(self, x):
         x = self.forward_features(x)
