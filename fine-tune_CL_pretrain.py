@@ -50,6 +50,7 @@ class ContrastiveLoss(nn.Module):
 
         # Calculate similarity matrix using dot product
         sim_matrix = torch.matmul(representations, representations.t())
+        print(sim_matrix)
 
         # Get positive and negative mask
         positive_mask = (pseudo_labels.unsqueeze(1) == pseudo_labels.unsqueeze(0)).float()
