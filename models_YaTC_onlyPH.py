@@ -43,8 +43,13 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         embed_dim = kwargs['embed_dim']
         self.fc_norm = norm_layer(embed_dim)
         
+        # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
+        # self.PH_1_relu = nn.ReLU()
+        
+        # CL = 15
+        self.PH_1_LayerNorm = nn.LayerNorm(normalized_shape=embed_dim)
         self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
-        self.PH_1_relu = nn.ReLU()
+        self.PH_1_gelu = nn.GELU()
         
         del self.norm  # remove the original norm
 
@@ -101,11 +106,15 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
 
     def forward_PH(self, x):
+        # if self.global_pool:
+        #     x = x[:, self.num_prefix_tokens:].mean(dim=1) if self.global_pool == 'avg' else x[:, 0]
+        # x = self.fc_norm(x)
+        # x = self.PH_1_relu(self.PH_1_linear(x))
+        # CL 15
         if self.global_pool:
             x = x[:, self.num_prefix_tokens:].mean(dim=1) if self.global_pool == 'avg' else x[:, 0]
-        x = self.fc_norm(x)
-        x = self.PH_1_relu(self.PH_1_linear(x))
-        # x = torch.tanh(self.PH_1_linear(x))
+        x = self.PH_1_LayerNorm(x)
+        x = self.PH_1_gelu(self.PH_1_linear(x))
         return x
 
     def forward(self, x):
