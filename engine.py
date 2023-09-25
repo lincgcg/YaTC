@@ -273,7 +273,7 @@ def CL_one_epoch(model: torch.nn.Module, criterion: torch.nn.Module,
             args=args, model=model, model_without_ddp=model_without_ddp, optimizer=optimizer,
             loss_scaler=loss_scaler, epoch=epoch, name='epoch'+str(epoch+1))
 
-    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}
+    return {k: meter.global_avg for k, meter in metric_logger.meters.items()}, loss_value_reduce
 
 @torch.no_grad()
 def evaluate(data_loader, model, device, is_test = False, prf_path = None):

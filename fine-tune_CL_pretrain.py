@@ -36,6 +36,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from PIL import Image
 
+import wandb
+
+
 class ContrastiveLoss(nn.Module):
     def __init__(self, temperature=0.1):
         super(ContrastiveLoss, self).__init__()
@@ -235,6 +238,12 @@ def get_args_parser():
     parser.add_argument("--temperature", type=float, default=0.1,
                         help="temperature")
 
+    # wandb
+    parser.add_argument("--project_name", type=str, default="YaTC",
+                        help="name of project")
+    parser.add_argument("--name", type=str, default="demo",
+                        help="name of process")
+
     return parser
 
 def build_dataset(args):
@@ -253,6 +262,18 @@ def build_dataset(args):
 
 def main(args):
     misc.init_distributed_mode(args)
+
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project = args.project_name,
+        name = args.name,
+        # track hyperparameters and run metadata
+        config={
+            "epoch_num": args.epochs,
+            "log_dir": args.log_dir,
+            "data_path": args.data_path
+        }
+    )
 
     print('job dir: {}'.format(os.path.dirname(os.path.realpath(__file__))))
     print("{}".format(args).replace(', ', ',\n'))
@@ -373,9 +394,11 @@ def main(args):
             args=args
         )
 
-        log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
+        log_stats = {**{f'train_{k}': v for k, v in train_stats[0].items()},
                         'epoch': epoch,
                         'n_parameters': n_parameters}
+        
+        wandb.log({"train_loss": train_stats[1]})
 
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
