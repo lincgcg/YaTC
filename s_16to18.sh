@@ -107,21 +107,21 @@
 
 # 16
 
-CUDA_VISIBLE_DEVICES=6 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 10 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/12/woDCS/16" --nb_classes 12 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/16" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/16" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/12/checkpoint-epoch1000.pth" --project_name DCS_YaTC_Service_16_10000 --name 16
+CUDA_VISIBLE_DEVICES=6 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 200 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/12/woDCS/16" --nb_classes 12 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/16" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/16" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/12/checkpoint-epoch1000.pth" --project_name DCS_YaTC_Service_16_10000 --name 16
 
 
 
 
 # 17
 
-CUDA_VISIBLE_DEVICES=6 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 10 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/12/woDCS/17" --nb_classes 12 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/17" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/17" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/12/checkpoint-epoch1000.pth" --project_name DCS_YaTC_Service_17_10000 --name 17
+CUDA_VISIBLE_DEVICES=6 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 200 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/12/woDCS/17" --nb_classes 12 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/17" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/17" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/12/checkpoint-epoch1000.pth" --project_name DCS_YaTC_Service_17_10000 --name 17
 
 
 
 
 # 18
 
-CUDA_VISIBLE_DEVICES=6 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 10 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/12/woDCS/18" --nb_classes 12 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/18" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/18" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/12/checkpoint-epoch1000.pth" --project_name DCS_YaTC_Service_18_10000 --name 18
+CUDA_VISIBLE_DEVICES=6 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 200 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/12/woDCS/18" --nb_classes 12 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/18" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/12/CL/18" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/12/checkpoint-epoch1000.pth" --project_name DCS_YaTC_Service_18_10000 --name 18
 
 
 
