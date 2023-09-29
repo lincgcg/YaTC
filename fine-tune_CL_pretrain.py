@@ -107,12 +107,8 @@ class CustomImageFolder(Dataset):
         name = self.get_name_from_filename(img_path)
         target = self.string_to_value[name]
         
-        # print("img_path")
-        # print(img_path)
-        # print("name")
-        # print(name)
-        # print("target")
-        # print(target)
+        print("self.string_to_value")
+        print(self.string_to_value)
         
         # 应用变换
         if self.transform:
