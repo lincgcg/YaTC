@@ -32,7 +32,7 @@ import models_YaTC_PH_Cls
 from engine import train_one_epoch, evaluate
 
 import wandb
-
+import tqdm
 
 def get_args_parser():
     parser = argparse.ArgumentParser('YaTC fine-tuning for traffic classification', add_help=False)
