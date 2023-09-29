@@ -358,6 +358,11 @@ def main(args):
 
         valid_stats = evaluate(data_loader_val, model, device)
 
+        wandb.log({"Valid_AC": valid_stats['acc1']})
+        wandb.log({"Valid_PR": valid_stats['macro_pre']})
+        wandb.log({"Valid_RC": valid_stats['macro_rec']})
+        wandb.log({"Valid_F1": valid_stats['macro_f1']})
+
         print(f"Accuracy of the network on the {len(dataset_val)} valid images: {valid_stats['acc1']:.4f}")
         print(f"F1 of the network on the {len(dataset_val)} valid images: {valid_stats['macro_f1']:.4f}")
 
@@ -376,10 +381,10 @@ def main(args):
     print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
 
 
-    wandb.log({"AC": test_stats['acc1']})
-    wandb.log({"PR": test_stats['macro_pre']})
-    wandb.log({"RC": test_stats['macro_rec']})
-    wandb.log({"F1": test_stats['macro_f1']})
+    wandb.log({"Test_AC": test_stats['acc1']})
+    wandb.log({"Test_PR": test_stats['macro_pre']})
+    wandb.log({"Test_RC": test_stats['macro_rec']})
+    wandb.log({"Test_F1": test_stats['macro_f1']})
 
     log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                     **{f'valid_{k}': v for k, v in test_stats.items()},
