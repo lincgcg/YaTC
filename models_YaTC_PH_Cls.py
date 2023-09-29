@@ -51,7 +51,12 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
         # self.PH_1_gelu = nn.GELU()
         
-        # # CL = 16
+        # # # CL = 16
+        # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
+        # self.PH_1_gelu = nn.GELU()
+        
+        # CL = 23
+        self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
         self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
         self.PH_1_gelu = nn.GELU()
 
@@ -121,8 +126,13 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # CL15
         # x = self.PH_1_LayerNorm(x)
         # x = self.PH_1_gelu(self.PH_1_linear(x))
-        # # CL16
+        # CL16
+        # x = self.PH_1_gelu(self.PH_1_linear(x))
+        
+        # CL23
+        x = self.PH_1_BatchNorm(x)
         x = self.PH_1_gelu(self.PH_1_linear(x))
+        
         return x
 
     def forward(self, x):
