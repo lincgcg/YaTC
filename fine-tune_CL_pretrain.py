@@ -9,6 +9,7 @@ import ipdb
 import torch
 import torch.backends.cudnn as cudnn
 from torch.utils.tensorboard import SummaryWriter
+import timm.optim.optim_factory as optim_factory
 
 import timm
 from torch.utils.data import Dataset
@@ -360,7 +361,7 @@ def main(args):
     #                                     no_weight_decay_list=model_without_ddp.no_weight_decay(),
     #                                     layer_decay=args.layer_decay
     #                                     )
-    optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)
+    param_groups = optim_factory.param_groups_weight_decay(model_without_ddp, args.weight_decay)
     optimizer = torch.optim.AdamW(param_groups, lr=args.lr, betas=(0.9, 0.95))
     loss_scaler = NativeScaler()
 
