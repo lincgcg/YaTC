@@ -63,6 +63,12 @@ class ContrastiveLoss(nn.Module):
         positive_similarities = sim_matrix * positive_mask
         negative_similarities = sim_matrix * negative_mask
 
+        print("positive_similarities")
+        print(positive_similarities)
+
+        print("negative_similarities")
+        print(negative_similarities)
+
         # Calculate logit (numerator)
         numerator = torch.exp(positive_similarities / self.temperature)
 
