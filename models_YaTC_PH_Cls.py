@@ -74,7 +74,7 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # CL 32
         self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
         self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
-        self.PH_1_relu = F.relu()
+        # self.PH_1_relu = F.relu()
 
         del self.norm  # remove the original norm
 
@@ -156,9 +156,9 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # x = self.PH_2_linear(x)
         
         # CL 32
-        self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
-        self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
-        self.PH_1_relu = F.relu()
+        x = self.PH_1_BatchNorm(x)
+        x = torch.nn.functional.relu(self.PH_1_linear(x))
+        # self.PH_1_relu = F.relu()
 
         return x
 
