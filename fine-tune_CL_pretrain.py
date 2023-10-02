@@ -63,6 +63,10 @@ class ContrastiveLoss(nn.Module):
         positive_similarities = sim_matrix * positive_mask
         negative_similarities = sim_matrix * negative_mask
 
+        print("positive_similarities")
+        print(positive_similarities)
+        print("negative_similarities")
+        print(negative_similarities)
         # Calculate logit (numerator)
         numerator = torch.exp(positive_similarities / self.temperature)
 
@@ -107,9 +111,6 @@ class CustomImageFolder(Dataset):
         # 从图像文件名中获取目标（target）
         name = self.get_name_from_filename(img_path)
         target = self.string_to_value[name]
-        
-        # print("self.string_to_value")
-        # print(self.string_to_value)
         
         # 应用变换
         if self.transform:
