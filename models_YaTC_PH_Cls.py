@@ -55,10 +55,10 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
         # self.PH_1_gelu = nn.GELU()
         
-        # CL = 23
-        self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
-        self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
-        self.PH_1_gelu = nn.GELU()
+        # # CL = 23
+        # self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
+        # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
+        # self.PH_1_gelu = nn.GELU()
         
         # # CL 30 : SimCLR
         # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
@@ -70,6 +70,11 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
         # self.PH_1_gelu = nn.GELU()
         # self.PH_2_linear = nn.Linear(embed_dim, embed_dim)
+
+        # CL 32
+        self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
+        self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
+        self.PH_1_relu = F.relu()
 
         del self.norm  # remove the original norm
 
@@ -138,9 +143,9 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # CL16
         # x = self.PH_1_gelu(self.PH_1_linear(x))
         
-        # CL23
-        x = self.PH_1_BatchNorm(x)
-        x = self.PH_1_gelu(self.PH_1_linear(x))
+        # # CL23
+        # x = self.PH_1_BatchNorm(x)
+        # x = self.PH_1_gelu(self.PH_1_linear(x))
         
         # # CL 30 : SimCLR
         # x = self.PH_1_gelu(self.PH_1_BatchNorm(self.PH_1_linear(x)))
@@ -150,6 +155,11 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # x = self.PH_1_gelu(self.PH_1_linear(x))
         # x = self.PH_2_linear(x)
         
+        # CL 32
+        self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
+        self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
+        self.PH_1_relu = F.relu()
+
         return x
 
     def forward(self, x):

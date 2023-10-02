@@ -11,6 +11,7 @@ from util.pos_embed import get_2d_sincos_pos_embed
 import skimage.filters.rank as sfr
 from skimage.morphology import disk
 import numpy as np
+import torch.nn.functional as F
 
 
 class PatchEmbed(nn.Module):
@@ -71,6 +72,11 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
         # self.PH_1_gelu = nn.GELU()
         # self.PH_2_linear = nn.Linear(embed_dim, embed_dim)
+        
+        # CL 32
+        self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
+        self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
+        self.PH_1_relu = F.relu()
 
         del self.norm  # remove the original norm
 
@@ -125,7 +131,6 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
 
         return outcome
 
-
     def forward_PH(self, x):
         # if self.global_pool:
         #     x = x[:, self.num_prefix_tokens:].mean(dim=1) if self.global_pool == 'avg' else x[:, 0]
@@ -144,8 +149,8 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # x = self.PH_1_gelu(self.PH_1_linear(x))
 
         # CL23
-        x = self.PH_1_BatchNorm(x)
-        x = self.PH_1_gelu(self.PH_1_linear(x))
+        # x = self.PH_1_BatchNorm(x)
+        # x = self.PH_1_gelu(self.PH_1_linear(x))
         
         # # CL 30 : SimCLR
         # x = self.PH_1_gelu(self.PH_1_BatchNorm(self.PH_1_linear(x)))
@@ -155,6 +160,10 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # x = self.PH_1_gelu(self.PH_1_linear(x))
         # x = self.PH_2_linear(x)
 
+
+        # CL32
+        x = self.PH_1_BatchNorm(x)
+        x = self.PH_1_relu(self.PH_1_linear(x))
         return x
 
     def forward(self, x):
