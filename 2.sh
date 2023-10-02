@@ -1,20 +1,19 @@
+# 6e-6
 
-# 1e-6
+# 50
 
-CUDA_VISIBLE_DEVICES=2,3,4 python  fine-tune_CL_pretrain.py --blr 1e-6 --epochs 200 --batch_size 2048 --nb_classes 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/CL" --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/1e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/1e-6" --finetune "/data0/mxy/linchungang/YaTC_file/pretrain_file/YaTC_pretrained_model.pth" --project_name YaTC_CL_Pretrain --name 29_1e-6_200
+CUDA_VISIBLE_DEVICES=3 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 200 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/woDCS/01" --nb_classes 17 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/6e-6/checkpoint-epoch50.pth" --project_name DCS_YaTC_application_CL --name 29_50_2e-3_6e-6
 
-# 3e-6
+# 100
 
-CUDA_VISIBLE_DEVICES=2,3,4 python  fine-tune_CL_pretrain.py --blr 3e-6 --epochs 200 --batch_size 2048 --nb_classes 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/CL" --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/3e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/3e-6" --finetune "/data0/mxy/linchungang/YaTC_file/pretrain_file/YaTC_pretrained_model.pth" --project_name YaTC_CL_Pretrain --name 29_3e-6_200
+CUDA_VISIBLE_DEVICES=3 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 200 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/woDCS/01" --nb_classes 17 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/6e-6/checkpoint-epoch100.pth" --project_name DCS_YaTC_application_CL --name 29_100_2e-3_6e-6
 
-# 5e-6
 
-CUDA_VISIBLE_DEVICES=2,3,4 python  fine-tune_CL_pretrain.py --blr 5e-6 --epochs 200 --batch_size 2048 --nb_classes 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/CL" --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/5e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/5e-6" --finetune "/data0/mxy/linchungang/YaTC_file/pretrain_file/YaTC_pretrained_model.pth" --project_name YaTC_CL_Pretrain --name 29_5e-6_200
+# 150
 
-# 7e-6
+CUDA_VISIBLE_DEVICES=3 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 200 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/woDCS/01" --nb_classes 17 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/6e-6/checkpoint-epoch150.pth" --project_name DCS_YaTC_application_CL --name 29_150_2e-3_6e-6
 
-CUDA_VISIBLE_DEVICES=2,3,4 python  fine-tune_CL_pretrain.py --blr 7e-6 --epochs 200 --batch_size 2048 --nb_classes 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/CL" --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/7e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/7e-6" --finetune "/data0/mxy/linchungang/YaTC_file/pretrain_file/YaTC_pretrained_model.pth" --project_name YaTC_CL_Pretrain --name 29_7e-6_200
 
-# 9e-6
+# 200
 
-CUDA_VISIBLE_DEVICES=2,3,4 python  fine-tune_CL_pretrain.py --blr 9e-6 --epochs 200 --batch_size 2048 --nb_classes 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/CL" --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/9e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/9e-6" --finetune "/data0/mxy/linchungang/YaTC_file/pretrain_file/YaTC_pretrained_model.pth" --project_name YaTC_CL_Pretrain --name 29_9e-6_200
+CUDA_VISIBLE_DEVICES=3 python fine-tune_CL_finetuen.py --blr 2e-3 --epochs 200 --batch_size 192 --data_path "/data0/mxy/linchungang/YaTC_file/YaTC_datasets/ISXWVPN/17/woDCS/01" --nb_classes 17 --output_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --log_dir "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/epoch_10/17/CL/demo/29/Parameter_Search/6e-6" --finetune "/data0/mxy/linchungang/YaTC_file/output/ISXWVPN/CL/17/demo/29/Parameter_Search/6e-6/checkpoint-epoch200.pth" --project_name DCS_YaTC_application_CL --name 29_200_2e-3_6e-6
