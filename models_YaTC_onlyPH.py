@@ -57,9 +57,9 @@ class TrafficTransformer(timm.models.vision_transformer.VisionTransformer):
         # self.PH_1_gelu = nn.GELU()
         
         # CL 23
-        self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
-        self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
-        self.PH_1_gelu = nn.GELU()
+        # self.PH_1_BatchNorm = nn.BatchNorm1d(embed_dim)
+        # self.PH_1_linear = nn.Linear(embed_dim, embed_dim)
+        # self.PH_1_gelu = nn.GELU()
 
 
         # # CL 30 : SimCLR
