@@ -84,29 +84,59 @@ class ContrastiveLoss2(nn.Module):
         representations = F.normalize(representations, p=2, dim=1)
         # representations = representations / 100.0
 
+        print("representations")
+        print(representations)
+        print("pseudo_labels")
+        print(pseudo_labels)
+        
         # Calculate similarity matrix using dot product
         sim_matrix = torch.matmul(representations, representations.t())
+
+        print("sim_matrix")
+        print(sim_matrix)
 
         # Get positive and negative mask
         positive_mask = (pseudo_labels.unsqueeze(1) == pseudo_labels.uns queeze(0)).float()
         negative_mask = (pseudo_labels.unsqueeze(1) != pseudo_labels.unsqueeze(0)).float()
         
+        print("positive_mask")
+        print(positive_mask)
+        print("negative_mask")
+        print(negative_mask)
+        
         # Ensure the diagonal is zero for positives
         positive_mask = positive_mask - torch.diag(positive_mask.diag())
+
+        print("positive_mask : Ensure the diagonal is zero for positives")
+        print(positive_mask)
 
         # Extract positive and negative similarities
         positive_similarities = sim_matrix * positive_mask
         negative_similarities = sim_matrix * negative_mask
 
+        print("positive_similarities")
+        print(positive_similarities)
+        print("negative_similarities")
+        print(negative_similarities)
+
         # Calculate logit (numerator)
         numerator = torch.exp(positive_similarities / self.temperature)
+
+        print("numerator")
+        print(numerator)
 
         # Calculate logit (denominator)
         # Here we sum up the negative similarities, and add the positive for numerical stability
         denominator = torch.sum(torch.exp(negative_similarities / self.temperature), dim=1) + numerator.diag()
 
+        print("denominator")
+        print(denominator)
+
         # Compute the loss
         loss = (-torch.log(numerator.diag() / (denominator + 1e-8))).mean()
+
+        print("loss")
+        print(loss)
 
         return loss
 
