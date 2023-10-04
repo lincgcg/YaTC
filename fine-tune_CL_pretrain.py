@@ -96,7 +96,7 @@ class ContrastiveLoss2(nn.Module):
         print(sim_matrix)
 
         # Get positive and negative mask
-        positive_mask = (pseudo_labels.unsqueeze(1) == pseudo_labels.uns queeze(0)).float()
+        positive_mask = (pseudo_labels.unsqueeze(1) == pseudo_labels.unsqueeze(0)).float()
         negative_mask = (pseudo_labels.unsqueeze(1) != pseudo_labels.unsqueeze(0)).float()
         
         print("positive_mask")
