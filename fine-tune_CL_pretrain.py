@@ -63,11 +63,40 @@ class ContrastiveLoss(nn.Module):
         positive_similarities = sim_matrix * positive_mask
         negative_similarities = sim_matrix * negative_mask
 
-        # print("positive_similarities")
-        # print(positive_similarities)
+        # Calculate logit (numerator)
+        numerator = torch.exp(positive_similarities / self.temperature)
 
-        # print("negative_similarities")
-        # print(negative_similarities)
+        # Calculate logit (denominator)
+        # Here we sum up the negative similarities, and add the positive for numerical stability
+        denominator = torch.sum(torch.exp(negative_similarities / self.temperature), dim=1) + numerator.diag()
+
+        # Compute the loss
+        loss = (-torch.log(numerator.diag() / (denominator + 1e-8))).mean()
+
+        return loss
+
+class ContrastiveLoss2(nn.Module):
+    def __init__(self, temperature=0.1):
+        super(ContrastiveLoss2, self).__init__()
+        self.temperature = temperature
+
+    def forward(self, representations, pseudo_labels):
+        representations = F.normalize(representations, p=2, dim=1)
+        # representations = representations / 100.0
+
+        # Calculate similarity matrix using dot product
+        sim_matrix = torch.matmul(representations, representations.t())
+
+        # Get positive and negative mask
+        positive_mask = (pseudo_labels.unsqueeze(1) == pseudo_labels.uns queeze(0)).float()
+        negative_mask = (pseudo_labels.unsqueeze(1) != pseudo_labels.unsqueeze(0)).float()
+        
+        # Ensure the diagonal is zero for positives
+        positive_mask = positive_mask - torch.diag(positive_mask.diag())
+
+        # Extract positive and negative similarities
+        positive_similarities = sim_matrix * positive_mask
+        negative_similarities = sim_matrix * negative_mask
 
         # Calculate logit (numerator)
         numerator = torch.exp(positive_similarities / self.temperature)
@@ -371,7 +400,7 @@ def main(args):
     mixup_fn = None
 
 
-    criterion = ContrastiveLoss(args.temperature)
+    criterion = ContrastiveLoss2(args.temperature)
 
     print("criterion = %s" % str(criterion))
 
