@@ -119,7 +119,7 @@ class ContrastiveLoss2(nn.Module):
         print("negative_similarities")
         print(negative_similarities)
 
-        # Calculate logit (numerator)
+        # Calculate logit (numerator
         numerator = torch.exp(positive_similarities / self.temperature)
 
         print("numerator")
@@ -127,6 +127,16 @@ class ContrastiveLoss2(nn.Module):
 
         # Calculate logit (denominator)
         # Here we sum up the negative similarities, and add the positive for numerical stability
+        
+        print("negative_similarities / self.temperature")
+        print(negative_similarities / self.temperature)
+        
+        print("torch.sum(torch.exp(negative_similarities / self.temperature), dim=1)")
+        print(torch.sum(torch.exp(negative_similarities / self.temperature), dim=1))
+        
+        print("numerator.diag()")
+        print(numerator.diag())
+        
         denominator = torch.sum(torch.exp(negative_similarities / self.temperature), dim=1) + numerator.diag()
 
         print("denominator")
