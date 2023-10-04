@@ -84,72 +84,72 @@ class ContrastiveLoss2(nn.Module):
         representations = F.normalize(representations, p=2, dim=1)
         # representations = representations / 100.0
 
-        print("representations")
-        print(representations)
-        print("pseudo_labels")
-        print(pseudo_labels)
+        # print("representations")
+        # print(representations)
+        # print("pseudo_labels")
+        # print(pseudo_labels)
         
         # Calculate similarity matrix using dot product
         sim_matrix = torch.matmul(representations, representations.t())
 
-        print("sim_matrix")
-        print(sim_matrix)
+        # print("sim_matrix")
+        # print(sim_matrix)
 
         # Get positive and negative mask
         positive_mask = (pseudo_labels.unsqueeze(1) == pseudo_labels.unsqueeze(0)).float()
         negative_mask = (pseudo_labels.unsqueeze(1) != pseudo_labels.unsqueeze(0)).float()
         
-        print("positive_mask")
-        print(positive_mask)
-        print("negative_mask")
-        print(negative_mask)
+        # print("positive_mask")
+        # print(positive_mask)
+        # print("negative_mask")
+        # print(negative_mask)
         
         # Ensure the diagonal is zero for positives
         positive_mask = positive_mask - torch.diag(positive_mask.diag())
 
-        print("positive_mask : Ensure the diagonal is zero for positives")
-        print(positive_mask)
+        # print("positive_mask : Ensure the diagonal is zero for positives")
+        # print(positive_mask)
 
         # Extract positive and negative similarities
         positive_similarities = sim_matrix * positive_mask
         negative_similarities = sim_matrix * negative_mask
 
-        print("positive_similarities")
-        print(positive_similarities)
-        print("negative_similarities")
-        print(negative_similarities)
+        # print("positive_similarities")
+        # print(positive_similarities)
+        # print("negative_similarities")
+        # print(negative_similarities)
 
         # Calculate logit numerator
         numerator = torch.sum(torch.exp(positive_similarities / self.temperature), dim=1)
 
-        print("numerator")
-        print(numerator)
+        # print("numerator")
+        # print(numerator)
 
         # Calculate logit (denominator)
         # Here we sum up the negative similarities, and add the positive for numerical stability
         
-        print("negative_similarities / self.temperature")
-        print(negative_similarities / self.temperature)
+        # print("negative_similarities / self.temperature")
+        # print(negative_similarities / self.temperature)
         
-        print("torch.sum(torch.exp(negative_similarities / self.temperature), dim=1)")
-        print(torch.sum(torch.exp(negative_similarities / self.temperature), dim=1))
+        # print("torch.sum(torch.exp(negative_similarities / self.temperature), dim=1)")
+        # print(torch.sum(torch.exp(negative_similarities / self.temperature), dim=1))
         
-        print("numerator.diag()")
-        print(numerator.diag())
+        # print("numerator.diag()")
+        # print(numerator.diag())
         
         denominator = torch.sum(torch.exp(negative_similarities / self.temperature), dim=1) + torch.sum(torch.exp(positive_similarities / self.temperature), dim=1)
 
-        print("denominator")
-        print(denominator)
+        # print("denominator")
+        # print(denominator)
 
         # Compute the loss
-        print("-torch.log(numerator / (denominator + 1e-8))")
-        print(-torch.log(numerator / (denominator + 1e-8)))
+        # print("-torch.log(numerator / (denominator + 1e-8))")
+        # print(-torch.log(numerator / (denominator + 1e-8)))
         
         loss = (-torch.log(numerator / (denominator + 1e-8))).mean()
 
-        print("loss")
-        print(loss)
+        # print("loss")
+        # print(loss)
 
         return loss
 
@@ -309,7 +309,8 @@ def get_args_parser():
     # CL
     parser.add_argument("--temperature", type=float, default=0.1,
                         help="temperature")
-
+    parser.add_argument("--ContrastiveLoss_ID", type=int, default=1,
+                        help="ContrastiveLoss ID")
     # wandb
     parser.add_argument("--project_name", type=str, default="YaTC",
                         help="name of project")
@@ -443,7 +444,11 @@ def main(args):
     mixup_fn = None
 
 
-    criterion = ContrastiveLoss2(args.temperature)
+    criterion = ContrastiveLoss(args.temperature)
+    if args.ContrastiveLoss_ID == 1:
+        criterion = ContrastiveLoss(args.temperature)
+    if args.ContrastiveLoss_ID == 2:
+        criterion = ContrastiveLoss2(args.temperature)
 
     print("criterion = %s" % str(criterion))
 
