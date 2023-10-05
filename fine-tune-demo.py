@@ -369,25 +369,43 @@ def main(args):
                         'epoch': epoch,
                         'n_parameters': n_parameters}
 
+        if (epoch+1) % 20 == 0:
+            # 进入test stage
+            test_stats = evaluate(data_loader_test, model, device, is_test = True, prf_path = args.log_dir)
+
+            print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.4f}")
+            print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
+
+
+            wandb.log({"Test_AC": test_stats['acc1']})
+            wandb.log({"Test_PR": test_stats['macro_pre']})
+            wandb.log({"Test_RC": test_stats['macro_rec']})
+            wandb.log({"Test_F1": test_stats['macro_f1']})
+
+            log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
+                            **{f'valid_{k}': v for k, v in test_stats.items()},
+                            'epoch': epoch,
+                            'n_parameters': n_parameters}
+
     total_time = time.time() - start_time
     total_time_str = str(datetime.timedelta(seconds=int(total_time)))
     print('Training time {}'.format(total_time_str))
-    # 进入test stage
-    test_stats = evaluate(data_loader_test, model, device, is_test = True, prf_path = args.log_dir)
+    # # 进入test stage
+    # test_stats = evaluate(data_loader_test, model, device, is_test = True, prf_path = args.log_dir)
 
-    print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.4f}")
-    print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
+    # print(f"Accuracy of the network on the {len(dataset_test)} test images: {test_stats['acc1']:.4f}")
+    # print(f"F1 of the network on the {len(dataset_test)} test images: {test_stats['macro_f1']:.4f}")
 
 
-    wandb.log({"Test_AC": test_stats['acc1']})
-    wandb.log({"Test_PR": test_stats['macro_pre']})
-    wandb.log({"Test_RC": test_stats['macro_rec']})
-    wandb.log({"Test_F1": test_stats['macro_f1']})
+    # wandb.log({"Test_AC": test_stats['acc1']})
+    # wandb.log({"Test_PR": test_stats['macro_pre']})
+    # wandb.log({"Test_RC": test_stats['macro_rec']})
+    # wandb.log({"Test_F1": test_stats['macro_f1']})
 
-    log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
-                    **{f'valid_{k}': v for k, v in test_stats.items()},
-                    'epoch': epoch,
-                    'n_parameters': n_parameters}
+    # log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
+    #                 **{f'valid_{k}': v for k, v in test_stats.items()},
+    #                 'epoch': epoch,
+    #                 'n_parameters': n_parameters}
 
 
 if __name__ == '__main__':
