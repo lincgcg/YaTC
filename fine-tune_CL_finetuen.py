@@ -387,6 +387,7 @@ def main(args):
                             **{f'valid_{k}': v for k, v in test_stats.items()},
                             'epoch': epoch,
                             'n_parameters': n_parameters}
+            break
 
     # total_time = time.time() - start_time
     # total_time_str = str(datetime.timedelta(seconds=int(total_time)))
